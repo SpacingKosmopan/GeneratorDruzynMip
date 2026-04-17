@@ -30,6 +30,7 @@
       <img src="logo-name-in-poland.png" alt="MIP-logo" />
       <img src="BE_color.png" alt="BE-logo-color" />
       <img src="spacing_logo.jpg" alt="spacing-logo" id="spacing-logo"/>
+      <p id="time-left"></p>
     </header>
 
     <hr>
@@ -403,6 +404,33 @@ tiles.forEach((tile) => {
   initTeams();
   renderTeams();
 });
+
+// TIMER UTC+0
+const INTERVAL = 28 * 24 * 60 * 60 * 1000;
+
+let targetDate = new Date("2026-05-15T15:00:00Z");
+
+function updateTimer() {
+    const now = new Date();
+
+    while (now >= targetDate) {
+        targetDate = new Date(targetDate.getTime() + INTERVAL);
+    }
+
+    const diff = targetDate - now;
+
+    const seconds = Math.floor(diff / 1000) % 60;
+    const minutes = Math.floor(diff / (1000 * 60)) % 60;
+    const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    const timeLeft = document.getElementById("time-left");
+    timeLeft.innerHTML=`Pozostało czasu do końca kontraktów: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
+updateTimer();
+
+setInterval(updateTimer, 1000);
     </script>
   </body>
 </html>
