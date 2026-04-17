@@ -386,3 +386,11 @@ hr::after {
     opacity: 1;
   }
 }
+
+a:not(:visited) {
+  color: rgb(255, 255, 255);
+}
+
+a:visited {
+  color: rgb(132, 148, 255);
+}
