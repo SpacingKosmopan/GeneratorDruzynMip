@@ -1,5 +1,15 @@
 # v1.1
 
+## Nowości
+
+- Dodano licznik graczy
+- Dodano zegar, który odmierza czas do zakończenia kontraktów (resetuje sie co 28 dni)
+
+## Poprawki
+
+- root wrapper był _div_ zamiast _body_
+- poprawiono formatowanie kodu
+
 # v1.0
 
 ## Generator Drużyn Made in Poland
