@@ -24,7 +24,7 @@
     <link rel="manifest" href="favicon/site.webmanifest" />
     <link rel="stylesheet" href="style.css" />
   </head>
-  <div>
+  <body>
     <header>
       <h1>Losowanie Drużyn - Turniej Made in Poland</h1>
       <img src="logo-name-in-poland.png" alt="MIP-logo" />
@@ -33,11 +33,11 @@
       <p id="time-left"></p>
     </header>
 
-    <hr>
-    
+    <hr />
+
     <!-- LISTA GRACZY -->
     <article id="players">
-      Lista graczy
+      <p id="players-count">Lista graczy:</p>
       <ul id="players-list"></ul>
     </article>
 
@@ -96,17 +96,13 @@
           <div id="teams-container"></div>
         </div>
       </div>
-
-      
     </main>
 
-    <hr>
+    <hr />
 
     <!-- CHANGELOG -->
     <article id="content">
-      <p>
-        Changelog
-      </p>
+      <p>Changelog</p>
       <div id="article-content"></div>
     </article>
 
@@ -216,6 +212,17 @@
       function renderPlayers() {
         const list = document.getElementById("players-list");
         list.innerHTML = "";
+        const count = document.getElementById("players-count");
+        count.innerHTML =
+          "Lista graczy: " +
+          players.length +
+          (players.length === 0
+            ? " osób"
+            : players.length === 1
+              ? " osoba"
+              : players.length >= 2 && players.length <= 4
+                ? " osoby"
+                : " osób");
 
         players.forEach((p) => {
           const li = document.createElement("li");
@@ -306,17 +313,17 @@
       function loop(now) {
         const clamped = Math.min((now - startTime) / duration, 1);
 
-// easing (smooth deceleration)
-const ease = 1 - Math.pow(clamped, 3);
+        // easing (smooth deceleration)
+        const ease = 1 - Math.pow(clamped, 3);
 
-// stała baza ruchu + easing
-const baseSpeed = 14;
-const speed = baseSpeed * ease;
+        // stała baza ruchu + easing
+        const baseSpeed = 14;
+        const speed = baseSpeed * ease;
 
-tiles.forEach((tile) => {
-  tile.x -= speed;
-  tile.el.style.transform = `translateX(${tile.x}px)`;
-});
+        tiles.forEach((tile) => {
+          tile.x -= speed;
+          tile.el.style.transform = `translateX(${tile.x}px)`;
+        });
 
         maybeSpawn();
 
@@ -331,33 +338,32 @@ tiles.forEach((tile) => {
       // WYNIK -> DRUŻYNA
 
       function finish() {
-  const center = 300;
+        const center = 300;
 
-  let best = null;
-  let bestDist = Infinity;
+        let best = null;
+        let bestDist = Infinity;
 
-  tiles.forEach((t) => {
-    const mid = t.x + 60;
-    const dist = Math.abs(mid - center);
+        tiles.forEach((t) => {
+          const mid = t.x + 60;
+          const dist = Math.abs(mid - center);
 
-    if (dist < bestDist) {
-      bestDist = dist;
-      best = t;
-    }
-  });
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = t;
+          }
+        });
 
-  if (!best) return;
+        if (!best) return;
 
-  queue = queue.filter((p) => p !== best.name);
+        queue = queue.filter((p) => p !== best.name);
 
-  const team = teams.find((t) => t.members.length < TEAM_SIZE);
+        const team = teams.find((t) => t.members.length < TEAM_SIZE);
 
-  if (team) team.members.push(best.name);
+        if (team) team.members.push(best.name);
 
-  renderTeams();
-  renderPool();
-
-}
+        renderTeams();
+        renderPool();
+      }
 
       // WYCZYŚĆ KAFELKI
 
