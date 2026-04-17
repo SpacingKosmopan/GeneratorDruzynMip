@@ -4,12 +4,405 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Generator Drużyn MiP</title>
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="favicon/site.webmanifest" />
+    <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
+  <div>
     <header>
       <h1>Losowanie Drużyn - Turniej Made in Poland</h1>
       <img src="logo-name-in-poland.png" alt="MIP-logo" />
       <img src="BE_color.png" alt="BE-logo-color" />
+      <img src="spacing_logo.jpg" alt="spacing-logo" id="spacing-logo"/>
     </header>
+
+    <hr>
+    
+    <!-- LISTA GRACZY -->
+    <article id="players">
+      Lista graczy
+      <ul id="players-list"></ul>
+    </article>
+
+    <main>
+      <div id="controls">
+        <div>
+          <input id="new-player-name" type="text" placeholder="Gracz..." />
+          <button onclick="addPlayer()">Dodaj</button>
+        </div>
+
+        <div><button onclick="spin()">Losuj gracza</button></div>
+        <div>
+          <label for="team-size">Ilość graczy w drużynie</label
+          ><input
+            type="range"
+            name="team-size"
+            id="team-size"
+            min="1"
+            max="5"
+            step="1"
+          />
+          <p style="display: inline" id="number-players-in-team"></p>
+        </div>
+
+        <div>
+          <label for="team-number">Ilość drużyn</label
+          ><input
+            type="range"
+            name="team-number"
+            id="team-number"
+            min="1"
+            max="12"
+            step="1"
+          />
+          <p style="display: inline" id="team-number-count"></p>
+        </div>
+
+        <div><button id="reset-teams">Resetuj drużyny</button></div>
+      </div>
+
+      <!-- ŚCIEŻKA LOSOWANIA -->
+      <div id="tiles-container">
+        <div id="center-line"></div>
+        <div id="track"></div>
+      </div>
+
+      <!-- GRACZE -->
+      <div id="layout">
+        <div id="pool">
+          <h3>Wolni gracze</h3>
+          <ul id="pool-list"></ul>
+        </div>
+
+        <div id="teams">
+          <h3>Drużyny</h3>
+          <div id="teams-container"></div>
+        </div>
+      </div>
+
+      
+    </main>
+
+    <hr>
+
+    <!-- CHANGELOG -->
+    <article id="content">
+      <p>
+        Changelog
+      </p>
+      <div id="article-content"></div>
+    </article>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+      async function loadChangelog(file) {
+        const res = await fetch(file);
+        const md = await res.text();
+
+        document.getElementById("article-content").innerHTML = marked.parse(md);
+      }
+
+      loadChangelog("changelog.md");
+
+      // losowanie graczy
+      let players = [];
+
+      let queue = [...players];
+
+      let tiles = [];
+      let spinning = false;
+
+      let TEAM_COUNT = 5;
+      let TEAM_SIZE = 3;
+
+      let teams = [];
+
+      // INIZJALIZACJA DRUŻYN
+
+      function initTeams() {
+        teams = [];
+
+        for (let i = 0; i < TEAM_COUNT; i++) {
+          teams.push({
+            name: "Team " + (i + 1),
+            members: [],
+          });
+        }
+        renderPool();
+      }
+
+      // SLIDERS
+
+      const playersSlider = document.getElementById("team-size");
+      const label = document.getElementById("number-players-in-team");
+
+      playersSlider.value = TEAM_SIZE;
+      label.textContent = TEAM_SIZE;
+
+      playersSlider.addEventListener("input", () => {
+        TEAM_SIZE = Number(playersSlider.value);
+        label.textContent = TEAM_SIZE;
+      });
+
+      const teamSlider = document.getElementById("team-number");
+      const teamLabel = document.getElementById("team-number-count");
+
+      teamSlider.value = TEAM_COUNT;
+      teamLabel.textContent = TEAM_COUNT;
+
+      teamSlider.addEventListener("input", () => {
+        TEAM_COUNT = Number(teamSlider.value);
+        teamLabel.textContent = TEAM_COUNT;
+
+        initTeams();
+        renderTeams();
+      });
+
+      // RESET
+
+      document.getElementById("reset-teams").addEventListener("click", () => {
+        initTeams();
+
+        queue = [...players];
+
+        teams.forEach((t) => (t.members = []));
+
+        renderTeams();
+        renderPool();
+        renderPlayers();
+      });
+
+      // RENDER DRUŻYN
+
+      function renderTeams() {
+        const el = document.getElementById("teams-container");
+        el.innerHTML = "";
+
+        teams.forEach((t) => {
+          const div = document.createElement("div");
+          div.className = "team";
+
+          div.innerHTML = `
+      <strong>${t.name}</strong>
+      <ul>
+        ${t.members.map((m) => `<li>${m}</li>`).join("")}
+      </ul>
+    `;
+
+          el.appendChild(div);
+        });
+      }
+
+      // PLAYERS
+
+      function renderPlayers() {
+        const list = document.getElementById("players-list");
+        list.innerHTML = "";
+
+        players.forEach((p) => {
+          const li = document.createElement("li");
+
+          const btn = document.createElement("button");
+          btn.textContent = "✕";
+          btn.style.marginLeft = "10px";
+
+          btn.onclick = () => removePlayer(p);
+
+          li.textContent = p + " ";
+          li.appendChild(btn);
+
+          list.appendChild(li);
+        });
+      }
+
+      function removePlayer(name) {
+        players = players.filter((p) => p !== name);
+        queue = queue.filter((p) => p !== name);
+
+        // usuń też z drużyn
+        teams.forEach((t) => {
+          t.members = t.members.filter((m) => m !== name);
+        });
+
+        renderPlayers();
+        renderPool();
+        renderTeams();
+      }
+
+      // SYSTEM KAFELKÓW
+
+      const track = document.getElementById("track");
+
+      const SPAWN_X = 700;
+      const DESPAWN_X = -400;
+      const SPACE = 150;
+
+      function randomFromQueue() {
+        return queue[Math.floor(Math.random() * queue.length)];
+      }
+
+      function createTile(name, x) {
+        const el = document.createElement("div");
+        el.className = "tile";
+        el.textContent = name;
+
+        el.style.transform = `translateX(${x}px)`;
+
+        track.appendChild(el);
+
+        return { name, x, el };
+      }
+
+      function maybeSpawn() {
+        if (!spinning) return;
+        if (queue.length === 0) return;
+
+        if (tiles.length === 0) {
+          tiles.push(createTile(randomFromQueue(), SPAWN_X));
+          return;
+        }
+
+        const last = tiles[tiles.length - 1];
+
+        if (last.x < SPAWN_X - SPACE) {
+          tiles.push(createTile(randomFromQueue(), SPAWN_X));
+        }
+      }
+
+      // PĘTLA
+
+      let startTime = 0;
+      const duration = 5000;
+
+      function spin() {
+        if (spinning || queue.length === 0) return;
+
+        clearTiles();
+
+        spinning = true;
+        startTime = performance.now();
+
+        requestAnimationFrame(loop);
+      }
+
+      function loop(now) {
+        const clamped = Math.min((now - startTime) / duration, 1);
+
+// easing (smooth deceleration)
+const ease = 1 - Math.pow(clamped, 3);
+
+// stała baza ruchu + easing
+const baseSpeed = 14;
+const speed = baseSpeed * ease;
+
+tiles.forEach((tile) => {
+  tile.x -= speed;
+  tile.el.style.transform = `translateX(${tile.x}px)`;
+});
+
+        maybeSpawn();
+
+        if (clamped < 1) {
+          requestAnimationFrame(loop);
+        } else {
+          spinning = false;
+          setTimeout(finish, 100);
+        }
+      }
+
+      // WYNIK -> DRUŻYNA
+
+      function finish() {
+  const center = 300;
+
+  let best = null;
+  let bestDist = Infinity;
+
+  tiles.forEach((t) => {
+    const mid = t.x + 60;
+    const dist = Math.abs(mid - center);
+
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = t;
+    }
+  });
+
+  if (!best) return;
+
+  queue = queue.filter((p) => p !== best.name);
+
+  const team = teams.find((t) => t.members.length < TEAM_SIZE);
+
+  if (team) team.members.push(best.name);
+
+  renderTeams();
+  renderPool();
+
+}
+
+      // WYCZYŚĆ KAFELKI
+
+      function clearTiles() {
+        tiles.forEach((t) => t.el.remove());
+        tiles = [];
+      }
+
+      // DODANIE GRACZA
+
+      function addPlayer() {
+        const input = document.getElementById("new-player-name");
+        const val = input.value.trim();
+
+        if (!val) return;
+
+        players.push(val);
+        queue.push(val);
+
+        input.value = "";
+
+        renderPlayers();
+        renderPool();
+      }
+
+      // POOL
+
+      function renderPool() {
+        const list = document.getElementById("pool-list");
+        list.innerHTML = "";
+
+        queue.forEach((p) => {
+          const li = document.createElement("li");
+          li.textContent = p;
+          list.appendChild(li);
+        });
+      }
+
+      // START
+
+      window.addEventListener("DOMContentLoaded", () => {
+  renderPlayers();
+  renderPool();
+  initTeams();
+  renderTeams();
+});
+    </script>
   </body>
 </html>

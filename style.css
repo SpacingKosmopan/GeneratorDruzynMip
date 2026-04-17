@@ -1,0 +1,388 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap");
+
+:root {
+  --bg: #0b1020;
+  --panel: rgba(255, 255, 255, 0.06);
+  --panel-strong: rgba(255, 255, 255, 0.1);
+  --text: #e8ecff;
+  --muted: rgba(232, 236, 255, 0.7);
+  --accent: #7c5cff;
+  --accent2: #00d4ff;
+  --danger: #ff4d6d;
+  --radius: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: radial-gradient(circle at top, #1a1f3a, var(--bg));
+  color: var(--text);
+}
+
+/*  HEADER  */
+
+header {
+  text-align: center;
+  padding: 30px 20px;
+}
+
+header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 15px;
+}
+
+header img {
+  height: 70px;
+  margin: 0 10px;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+}
+
+/*  MAIN LAYOUT  */
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/*  PANELS  */
+
+article,
+#add-player-div,
+#layout > div {
+  background: var(--panel);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+#controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#controls > div {
+  flex: 1;
+  min-width: 180px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+}
+
+#controls > div:first-child {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#controls > div:first-child input {
+  flex: 1;
+  min-width: 0;
+}
+
+/*  PLAYER LIST  */
+
+#players {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+#players ul,
+#pool-list,
+#players-list {
+  list-style: none;
+  padding: 0;
+}
+
+#players li,
+#pool li {
+  padding: 8px 10px;
+  margin: 6px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+/* delete button */
+#players button {
+  background: var(--danger);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+/*  INPUTS  */
+
+input[type="text"] {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  width: 200px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+input[type="range"] {
+  accent-color: var(--accent);
+}
+
+/*  BUTTONS  */
+
+button {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    filter 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+button:active {
+  transform: translateY(0px);
+}
+
+/*  LAYOUT  */
+
+#layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+  align-items: start;
+}
+
+#teams-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.team {
+  background: var(--panel-strong);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+/*  TILE SYSTEM (LEPSZY LOOK)  */
+
+#tiles-container {
+  position: relative;
+  width: 600px;
+  height: 120px;
+  margin: 40px auto;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #11152b, #1b2142);
+  box-shadow:
+    0 0 20px rgba(124, 92, 255, 0.25),
+    0 0 40px rgba(0, 212, 255, 0.15),
+    inset 0 0 60px rgba(0, 0, 0, 0.6);
+}
+
+/*  GLOW  */
+
+#tiles-container::before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 0;
+  width: 120px;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+
+  background: radial-gradient(
+    circle at left center,
+    rgba(124, 92, 255, 0.9),
+    rgba(124, 92, 255, 0.25),
+    transparent 70%
+  );
+
+  filter: blur(10px);
+
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+#tiles-container::after {
+  content: "";
+  position: absolute;
+  right: -20px;
+  top: 0;
+  width: 120px;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+
+  background: radial-gradient(
+    circle at right center,
+    rgba(0, 212, 255, 0.9),
+    rgba(0, 212, 255, 0.25),
+    transparent 70%
+  );
+
+  filter: blur(10px);
+
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+#track {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+#center-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+  transform: translateX(-1px);
+  opacity: 0.6;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.tile {
+  position: absolute;
+  top: 30px;
+  width: 120px;
+  height: 60px;
+  background: linear-gradient(135deg, #2b2f55, #1b1f3a);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /*transition: transform 0.2s ease;*/
+}
+
+.tile:hover {
+  transform: scale(1.05);
+}
+
+/*  CHANGELOG  */
+
+#content {
+  max-width: 700px;
+  margin: 0 auto 40px auto;
+  opacity: 0.9;
+}
+
+#content p {
+  justify-content: center;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+#article-content {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+article,
+#controls,
+#layout > div {
+  margin-bottom: 0;
+}
+
+#spacing-logo {
+  border-radius: 50%;
+}
+
+/*  LINIA POZIOMA  */
+
+hr {
+  border: none;
+  height: 2px;
+  margin: 24px 0;
+  position: relative;
+  background: transparent;
+}
+
+hr::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(124, 92, 255, 0.9),
+    rgba(0, 212, 255, 0.9),
+    transparent
+  );
+
+  box-shadow:
+    0 0 15px rgba(124, 92, 255, 0.9),
+    0 0 30px rgba(0, 212, 255, 0.7),
+    0 0 60px rgba(0, 212, 255, 0.4);
+
+  border-radius: 999px;
+
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+hr::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  top: -4px;
+  height: 10px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(124, 92, 255, 0.3),
+    rgba(0, 212, 255, 0.3),
+    transparent
+  );
+
+  filter: blur(6px);
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
