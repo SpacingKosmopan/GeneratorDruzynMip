@@ -1,3 +1,9 @@
+# v1.2
+
+- Przyspieszono losowanie
+- Zmieniono pozycję końcową kafelków po wylosowaniu
+- Usunięto zegar odmierzający czas do zakończenia kontraktów
+
 # v1.1
 
 ## Nowości
