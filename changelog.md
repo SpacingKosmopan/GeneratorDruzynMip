@@ -1,9 +1,15 @@
+# v1.2
+
+- Przyspieszono losowanie
+- Zmieniono pozycję końcową kafelków po wylosowaniu
+- Usunięto zegar odmierzający czas do zakończenia kontraktów
+
 # v1.1
 
 ## Nowości
 
 - Dodano licznik graczy
-- Dodano zegar, który odmierza czas do zakończenia kontraktów (resetuje sie co 28 dni)
+- Dodano zegar, który odmierza czas do zakończenia kontraktów (resetuje się co 28 dni)
 
 ## Poprawki
 
